@@ -4,27 +4,42 @@ from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 DATABASE = "pictures.db"
-
-# Utilise threading.local() pour créer un objet de connexion différent pour chaque thread
+# Utilise threading.local() pour gérer le multi tâches
 connection = threading.local()
 
-# Crée une fonction pour obtenir la connexion de la base de données
+
+
+#################################################################################################
+##################################BASIC FUNCTION#################################################
+#################################################################################################
+
+# Crée une fonction pour obtenir la connexion de la base de données         // From tierce
 def get_db():
     if not hasattr(connection, "db"):
         connection.db = sqlite3.connect(DATABASE)
         connection.cursor_obj = connection.db.cursor()
     return connection.db, connection.cursor_obj
 
-
-
-
-
-
-# Crée une fonction pour récupérer une image aléatoire depuis la base de données
 def get_random_image():
     db, cursor = get_db()
     cursor.execute("SELECT * FROM Images ORDER BY RANDOM() LIMIT 1")
     return cursor.fetchone()
+
+
+#################################################################################################
+##################################BASIC FUNCTION#################################################
+#################################################################################################
+
+
+
+
+
+
+
+# Crée une route pour afficher la page
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 # Crée une route pour générer une image aléatoire
 @app.route("/generate-image")
@@ -38,11 +53,6 @@ def generate_image():
     else:
         return "No images found in database"
 
-# Crée une route pour afficher la page
-@app.route("/")
-def index():
-    return render_template("hello.html")
-
 # Crée une route pour ajouter une nouvelle image à la base de données
 @app.route("/add-image", methods=["POST"])
 def add_image():
@@ -52,10 +62,9 @@ def add_image():
     if description and url:
         cursor.execute("INSERT INTO Images (description, url) VALUES (?, ?)", (description, url))
         db.commit()
-        return "Image added successfully"
+        return render_template("index.html", url=url, description=description)
     else:
-        return "Please provide a description and a URL for the image"
-
+        return "Renvoyer une description et un URL correct !"
 
 @app.route("/show-image")
 def show_image():
@@ -63,10 +72,20 @@ def show_image():
     if image:
         url = image[2]
         description = image[1]
-        return render_template("image.html", url=url, description=description)
+        return render_template("random.html", url=url, description=description)
     else:
-        return "No images found in database"
+        return "Aucune image présente..."
 
+
+
+
+
+
+
+
+
+#################################################################################################
+#Initialisation de la base de donnée + création  de la table si elle n'existe pas
 if __name__ == "__main__":
     # Crée la table Images si elle n'existe pas déjà
     conn, c = get_db()
@@ -76,3 +95,4 @@ if __name__ == "__main__":
                  url TEXT NOT NULL)''')
     conn.commit()
     app.run(debug=True)
+#################################################################################################

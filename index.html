@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hello Flask</title>
+    <meta charset="utf-8">
+    <title>Random Image</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container mt-5">
+		<h1 class="text-center">Ajouter une nouvelle image</h1>
+		<div class="row justify-content-center">
+			<div class="col-6">
+				<form method="POST" action="/add-image">
+					<div class="form-group">
+						<label for="description">Description :</label>
+						<input type="text" class="form-control" id="description" name="description">
+					</div>
+					<div class="form-group">
+						<label for="url">URL :</label>
+						<input type="text" class="form-control" id="url" name="url" pattern="^(ftp|http|https):\/\/[^ "]+$">
+					</div>
+					<div class="form-group">
+						<label for="text_on_image">Texte sur l'image :</label>
+						<textarea class="form-control" id="text_on_image" name="text_on_image"></textarea>
+					</div>
+					<button type="submit" class="btn btn-primary">Ajouter</button>
+				</form>
+			</div>
+		</div>
+        <hr>
+
+        <h1 class="text-center">Random Image</h1>
+        <div class="row justify-content-center">
+            <div class="col-6">
+                {% if url %}
+                    <p class="text-center">Description: {{ description }}</p>
+                    <img src="{{ url }}" alt="Random Image" class="d-block mx-auto" height="500px" width="500px">
+                    <p class="text-center">{{ text_on_image }}</p>
+                {% else %}
+                    <p class="text-center">Aucune image importée pour le moment</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
